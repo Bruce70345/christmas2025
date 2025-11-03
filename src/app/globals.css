@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-family: var(--font-mono, "Roboto Mono", monospace);
+  color: #0f172a;
+  background-color: #fff7ec;
+}
+
+.banner-section {
+  background-color: #004369;
+  color: #fff7ec;
+}
+
+.layered-text {
+  position: relative;
+  display: inline-block;
+  z-index: 0;
+  font-family: var(--font-display, "Anton", sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  --shadow-x: 0.2rem;
+  --shadow-y: 0.2rem;
+}
+
+.layered-text::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(var(--shadow-x), var(--shadow-y));
+  z-index: -1;
+}
+
+.banner-subtitle {
+  font-family: var(--font-display, "Anton", sans-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.font-display {
+  font-family: var(--font-display, "Anton", sans-serif);
+}
+
+.banner-title {
+  color: #e95e5b;
+  letter-spacing: 0.2rem;
+  --shadow-x: 0.2rem;
+  --shadow-y: 0.2rem;
+}
+
+.banner-title::after {
+  color: #507a83;
+}
+
+.banner-kicker {
+  color: #fff7ec;
+  letter-spacing: 0.2rem;
+  --shadow-x: 0.2rem;
+  --shadow-y: 0.2rem;
+}
+
+.banner-kicker::after {
+  color: #e95e5b;
+}
+
+@media (min-width: 1024px) {
+  .banner-title {
+  letter-spacing: 0.4rem;
+  --shadow-x: 0.4rem;
+  --shadow-y: 0.4rem;
+  }
+
+  .banner-kicker {
+  letter-spacing: 0.4rem;
+  --shadow-x: 0.4rem;
+  --shadow-y: 0.4rem;
+  }
 }
