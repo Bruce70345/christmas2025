@@ -1,4 +1,1 @@
-blob:https://www.canva.com/50f376fb-41a8-402e-b45c-1e6a6b330626
-
-
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" version="1.0" viewBox="-0.0 4.7 124.0 122.9" zoomAndPan="magnify" style="fill: rgb(0, 0, 0);" original_string_length="874" width="282.3174458032474px" height="280.2642280155874px"><g id="__id12_syj4yglxo9"><path d="m -781.72544,-305.28626 a 59.531663,59.531663 0 0 0 -27.06637,79.72093 59.531663,59.531663 0 0 0 79.72102,27.06661 59.531663,59.531663 0 0 0 29.7204,-33.43105 45.260356,45.260356 0 0 1 -12.26065,8.91008 45.260356,45.260356 0 0 1 -60.60976,-20.57801 45.260356,45.260356 0 0 1 20.57785,-60.60961 45.260356,45.260356 0 0 1 14.54327,-4.33349 59.531663,59.531663 0 0 0 -44.62576,3.25454 z" fill-rule="evenodd" transform="translate(823.286 318.038)" style="fill: rgb(255, 200, 64);"/></g></svg>
