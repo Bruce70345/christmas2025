@@ -43,7 +43,7 @@ export default function Banner() {
         </span>
       </p>
       <h1
-        className="absolute left-[50%] top-[25%] z-10 w-full -translate-x-1/2 text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[15%] lg:top-auto lg:left-[50%] lg:text-[14vw]"
+        className="absolute top-[25%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[5%] lg:top-auto lg:text-[13vw]"
         data-text="CHRISTMAS"
       >
         <span className="layered-text banner-title" data-text="CHRISTMAS">

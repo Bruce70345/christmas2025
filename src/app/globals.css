@@ -18,7 +18,7 @@ body {
   z-index: 0;
   font-family: var(--font-display, "Anton", sans-serif);
   text-transform: uppercase;
-  letter-spacing: 0.2rem;
+  letter-spacing: 1.5rem;
   --shadow-x: 0.2rem;
   --shadow-y: 0.2rem;
 }
@@ -34,7 +34,7 @@ body {
 
 .banner-subtitle {
   font-family: var(--font-display, "Anton", sans-serif);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.8rem;
   text-transform: uppercase;
 }
 
@@ -44,7 +44,7 @@ body {
 
 .banner-title {
   color: #e95e5b;
-  letter-spacing: 0.2rem;
+  letter-spacing: 0.5rem;
   --shadow-x: 0.2rem;
   --shadow-y: 0.2rem;
 }
@@ -55,7 +55,7 @@ body {
 
 .banner-kicker {
   color: #fff7ec;
-  letter-spacing: 0.2rem;
+  letter-spacing: 0.5rem;
   --shadow-x: 0.2rem;
   --shadow-y: 0.2rem;
 }
@@ -66,13 +66,13 @@ body {
 
 @media (min-width: 1024px) {
   .banner-title {
-  letter-spacing: 0.4rem;
+  letter-spacing: 1.5rem;
   --shadow-x: 0.4rem;
   --shadow-y: 0.4rem;
   }
 
   .banner-kicker {
-  letter-spacing: 0.4rem;
+  letter-spacing: 1.5rem;
   --shadow-x: 0.4rem;
   --shadow-y: 0.4rem;
   }
