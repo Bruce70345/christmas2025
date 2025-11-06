@@ -42,9 +42,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full bg-[#fff7ec] text-slate-900">
+    <html lang="en" className="h-full bg-[#004369] text-slate-900">
       <body
-        className={`${robotoMono.variable} ${anton.variable} antialiased min-h-screen bg-transparent`}
+        className={`${robotoMono.variable} ${anton.variable} antialiased min-h-screen `}
       >
         {children}
       </body>
