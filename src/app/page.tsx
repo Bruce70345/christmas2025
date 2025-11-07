@@ -4,5 +4,5 @@ import Music from "@/sections/music";
 import Signup from "@/sections/signup";
 
 export default function Home() {
-  return <><Banner /><Music/><Explain /><Signup/></>;
+  return <><Banner/><Music/><Explain /><Signup/></>;
 }

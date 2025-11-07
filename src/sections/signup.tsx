@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Signup() {
   return (
-    <section className="banner-section min-h-[100vh] p-[6vw]">
+    <section className="banner-section min-h-[100vh] relative p-[6vw]">
       <div className="absolute z-20 w-[90vw] top-[17%] -translate-0.5 lg:-translate-0 lg:right-[10%] lg:w-fit lg:top-[27%]">
         <div className="w-full max-w-md rounded-[40px] border border-white/10 bg-white/5 p-6 text-left text-white shadow-2xl backdrop-blur">
           <form className="space-y-4">
