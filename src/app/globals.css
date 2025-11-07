@@ -24,6 +24,7 @@ body {
   letter-spacing: 1.5rem;
   --shadow-x: 0.2rem;
   --shadow-y: 0.2rem;
+  line-height: 5rem;
 }
 
 .layered-text::after {
@@ -79,6 +80,10 @@ body {
   --shadow-x: 0.4rem;
   --shadow-y: 0.4rem;
   }
+
+  .layered-text {
+  line-height: 8rem;
+}
 }
 
 @theme inline {

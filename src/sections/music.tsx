@@ -126,33 +126,33 @@ export default function Music() {
   };
 
   return (
-    <section className="banner-section relative grid min-h-[100svh] place-items-center overflow-hidden px-[6vw] pb-[8vh] pt-[12vh] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh] lg:px-[6vw] lg:pb-[8vh] lg:pt-[12vh]">
+    <section className="banner-section relative grid min-h-[100svh] place-items-center overflow-hidden px-[6vw] py-[8vw] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh]">
       <Image
         src="/graphs/musicGroup.png"
         alt="Festive musicians gathered on stage"
-        width={240}
-        height={197}
+        width={2400}
+        height={1970}
         className="pointer-events-none absolute bottom-[10%] z-10 w-[100vw] lg:w-[65vw] lg:right-[5%] lg:bottom-[-10%]"
       />
       <Image
         src="/graphs/musician.png"
         alt="Solo musician illustration"
-        width={649}
-        height={800}
+        width={6490}
+        height={8000}
         className="pointer-events-none absolute bottom-[10%] z-5 w-[60vw] left-[-15%] md:hidden "
       />
       <h2
-        className="absolute top-[5%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[0%] lg:top-auto lg:text-[13vw]"
-        data-text="MUSIC LIST"
+        className="absolute top-[5%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[0%] lg:left-[-10%] lg:top-auto lg:text-[13vw]"
+        data-text="PLAYLIST"
       >
         <span
           className="layered-text banner-title"
-          data-text="MUSIC LIST"
+          data-text="PLAYLIST"
         >
-          MUSIC LIST
+          PLAYLIST
         </span>
       </h2>
-      <div className="absolute top-[20%] z-20 w-full max-w-[90vw] space-y-4 text-[5.2vw] font-semibold tracking-[0.12em] md:space-y-3 md:text-[2.4vw] lg:left-[10%] lg:top-[20%] lg:max-w-[60vw] lg:text-[2vw]">
+      <div className="absolute top-[20%] z-20 w-full max-w-[90vw] space-y-4 text-[5.2vw] font-semibold tracking-[0.12em] md:space-y-4 md:text-[2.4vw] lg:left-[10%] lg:top-[20%] lg:max-w-[60vw] lg:text-[2vw]">
         {songs.slice(0, 3).map((song, index) => (
           <div
             key={`${song}-${index}`}
