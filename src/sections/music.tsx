@@ -13,6 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useYouTubeSongPlayer } from "@/hooks/useYouTubeSongPlayer";
+import { YouTubeMiniPlayer } from "@/components/youtube-mini-player";
 
 const songs = [
   "HERE COMES SANTA CLAUS (SYNTH EDIT)",
@@ -108,22 +110,17 @@ function SongRow({
 }
 
 export default function Music() {
-  const [activeSongIndex, setActiveSongIndex] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleTogglePlay = (index: number) => {
-    if (activeSongIndex === index) {
-      console.log("Pause song", songs[index]);
-      setActiveSongIndex(null);
-    } else {
-      console.log("Play song", songs[index]);
-      setActiveSongIndex(index);
-    }
-  };
-
-  const handleOpenYouTube = (index: number) => {
-    console.log("YouTube link", songs[index]);
-  };
+  const {
+    activeIndex,
+    isLoading,
+    error,
+    currentVideoId,
+    currentSongTitle,
+    togglePlay,
+    openYouTube,
+    stop,
+  } = useYouTubeSongPlayer();
 
   return (
     <section className="banner-section relative grid min-h-[100svh] place-items-center overflow-hidden px-[6vw] py-[8vw] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh]">
@@ -153,6 +150,10 @@ export default function Music() {
         </span>
       </h2>
       <div className="absolute top-[20%] z-20 w-full max-w-[90vw] space-y-4 text-[5.2vw] font-semibold tracking-[0.12em] md:space-y-4 md:text-[2.4vw] lg:left-[10%] lg:top-[20%] lg:max-w-[60vw] lg:text-[2vw]">
+        {isLoading && (
+          <p className="text-sm text-white/80">Searching YouTube...</p>
+        )}
+        {error && <p className="text-sm text-red-300">{error}</p>}
         {songs.slice(0, 3).map((song, index) => (
           <div
             key={`${song}-${index}`}
@@ -162,20 +163,20 @@ export default function Music() {
               song={song}
               index={index}
               dense
-              isActive={activeSongIndex === index}
-              onTogglePlay={() => handleTogglePlay(index)}
-              onOpenYouTube={() => handleOpenYouTube(index)}
+              isActive={activeIndex === index}
+              onTogglePlay={() => togglePlay(index, song)}
+              onOpenYouTube={() => openYouTube(index, song)}
             />
           </div>
         ))}
         <div className="flex justify-start">
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              setActiveSongIndex(null);
-            }}
-          >
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                setIsDialogOpen(open);
+                stop();
+              }}
+            >
             <DialogTrigger asChild>
               <button
                 type="button"
@@ -199,9 +200,9 @@ export default function Music() {
                     <SongRow
                       song={song}
                       index={index}
-                      isActive={activeSongIndex === index}
-                      onTogglePlay={() => handleTogglePlay(index)}
-                      onOpenYouTube={() => handleOpenYouTube(index)}
+                      isActive={activeIndex === index}
+                      onTogglePlay={() => togglePlay(index, song)}
+                      onOpenYouTube={() => openYouTube(index, song)}
                     />
                   </div>
                 ))}
@@ -218,6 +219,11 @@ export default function Music() {
           </Dialog>
         </div>
       </div>
+      <YouTubeMiniPlayer
+        videoId={currentVideoId}
+        title={currentSongTitle}
+        onClose={stop}
+      />
     </section>
   );
 }
