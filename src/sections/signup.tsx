@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,13 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { SongSearchField } from "@/components/song-search-field";
+import { AddressSearchField } from "@/components/address-search-field";
 
 export default function Signup() {
+  const [address, setAddress] = useState("");
+  const [postcardTheme, setPostcardTheme] = useState("");
+  const [songSuggestion, setSongSuggestion] = useState("");
 
   return (
     <section className="banner-section min-h-[100vh] relative p-[6vw]">
@@ -32,14 +38,39 @@ export default function Signup() {
             />
 
             <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
-              ADDRESS
+              ADDRESS <span className="text-[#ffc840]">*</span>
             </label>
-            <Input
+            <AddressSearchField
               id="address"
-              type="address"
-              placeholder="address"
-              className="w-full rounded-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-[#ffc840] focus:outline-none"
+              value={address}
+              onValueChange={setAddress}
             />
+
+            <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
+              EXPECTING POSTCARD THEME <span className="text-[#ffc840]">*</span>
+            </label>
+            <div className="flex flex-wrap gap-3 px-2 rounded-full border border-white/20">
+              {["Christmas", "Taiwan"].map((theme) => (
+                <label
+                  key={theme}
+                  className={`flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-xs uppercase tracking-[0.2em] ${
+                    postcardTheme === theme
+                      ? ""
+                      : "text-white/70 hover:border-[#ffc840]/60 ring-0"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="postcardTheme"
+                    value={theme}
+                    checked={postcardTheme === theme}
+                    onChange={() => setPostcardTheme(theme)}
+                    className="accent-[#d7665d] w-2 h-2"
+                  />
+                  {theme}
+                </label>
+              ))}
+            </div>
 
             <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
               EMAIL or INSTA
@@ -54,11 +85,10 @@ export default function Signup() {
             <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
               SONG SUGGESTION
             </label>
-            <Input
+            <SongSearchField
               id="songSuggestion"
-              type="text"
-              placeholder="song suggestion  (optional)"
-              className="w-full rounded-full border border-white/20 bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-[#ffc840] focus:outline-none"
+              value={songSuggestion}
+              onValueChange={setSongSuggestion}
             />
             <p className="text-xs px-4">
               All the data will be encrypted and save secretly, and data will be
@@ -79,8 +109,8 @@ export default function Signup() {
                     Merry Christmas!
                   </DialogTitle>
                   <DialogDescription className="text-white/80">
-                    So happy to celebrate this Christmas with you! <br/>Merry
-                    Christmas! &lt; 聖誕快樂! &gt;
+                    So happy to celebrate this Christmas with you! Merry
+                    Christmas 聖誕快樂
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
