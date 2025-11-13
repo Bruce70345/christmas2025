@@ -1,8 +1,21 @@
+"use client";
+
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export default function Signup() {
+
   return (
     <section className="banner-section min-h-[100vh] relative p-[6vw]">
       <div className="absolute z-20 w-[90vw] top-[17%] -translate-0.5 lg:-translate-0 lg:right-[10%] lg:w-fit lg:top-[27%]">
@@ -19,7 +32,7 @@ export default function Signup() {
             />
 
             <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
-              ADDRESS <span className="text-[#ffc840]">*</span>
+              ADDRESS
             </label>
             <Input
               id="address"
@@ -51,15 +64,34 @@ export default function Signup() {
               All the data will be encrypted and save secretly, and data will be
               deleted once the Christmas cards are sent!
             </p>
-            <Button
-              type="button"
-              className="mt-4 w-full rounded-full bg-[#d7665d] py-3 text-sm font-semibold uppercase tracking-[0.3em] text-[#f8c024] transition hover:bg-[#f8c024] hover:text-[#d7665d]"
-              // onClick={(e) => {
-              //   e.preventDefault();
-              // }}
-            >
-              SEND
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  className="mt-4 w-full rounded-full bg-[#d7665d] py-3 text-sm font-semibold uppercase tracking-[0.3em] text-[#f8c024] transition hover:bg-[#f8c024] hover:text-[#d7665d]"
+                >
+                  SEND
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#1b0f1a]/90 text-white border-white/10">
+                <DialogHeader>
+                  <DialogTitle className="text-xl tracking-wide text-[#f8c024]">
+                    Merry Christmas!
+                  </DialogTitle>
+                  <DialogDescription className="text-white/80">
+                    So happy to celebrate this Christmas with you! <br/>Merry
+                    Christmas! &lt; 聖誕快樂! &gt;
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button className="w-full rounded-full bg-[#f8c024] text-[#d7665d] hover:bg-[#ffd867]">
+                      CLOSE
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </form>
         </div>
       </div>
