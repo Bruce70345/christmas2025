@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Pause, Play } from "lucide-react";
-import { siYoutube } from "simple-icons";
+import { siSpotify, siYoutube } from "simple-icons";
 import Marquee from "react-fast-marquee";
 import {
   Dialog,
@@ -43,6 +43,20 @@ function YoutubeIcon() {
       className="size-5"
     >
       <path d={siYoutube.path} fill="currentColor" />
+    </svg>
+  );
+}
+
+function SpotifyIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      role="img"
+      aria-hidden="true"
+      focusable="false"
+      className="size-6"
+    >
+      <path d={siSpotify.path} fill="currentColor" />
     </svg>
   );
 }
@@ -154,6 +168,19 @@ export default function Music() {
           <p className="text-sm text-white/80">Searching YouTube...</p>
         )}
         {error && <p className="text-sm text-red-300">{error}</p>}
+        <a
+          href="https://open.spotify.com/playlist/78RGRLghGmsJb2Jvl3fIAD?si=2c529a41328e489e&pt=9246f3beab8f0fd38c0091c305345b5d"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-3 rounded-full border border-[#1ed760]/40 bg-black/40 px-5 py-2 text-left text-white shadow-sm shadow-black/20 backdrop-blur transition hover:bg-black/60"
+        >
+          <span className="text-[#1ed760]">
+            <SpotifyIcon />
+          </span>
+          <span className="text-[4vw] font-semibold tracking-[0.1em] md:text-[1.5vw]">
+            Share songs with Bruce
+          </span>
+        </a>
         {songs.slice(0, 3).map((song, index) => (
           <div
             key={`${song}-${index}`}
