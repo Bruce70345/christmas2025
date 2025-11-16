@@ -10,9 +10,7 @@ const FIELD_MASK = [
 ].join(",");
 
 const PLACES_API_KEY =
-  process.env.GOOGLE_PLACES_API_KEY ??
-  process.env.GOOGLE_MAPS_API_KEY ??
-  process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY ??
+  process.env.YOUTUBE_API_KEY ??
   "";
 
 export async function POST(request: Request) {
