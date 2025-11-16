@@ -25,12 +25,8 @@ export default function Signup() {
   const [contact, setContact] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const {
-    submitSignup,
-    isSubmitting,
-    isSuccess,
-    resetStatus,
-  } = useSignupSheet();
+  const { submitSignup, isSubmitting, isSuccess, resetStatus } =
+    useSignupSheet();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -161,8 +157,8 @@ export default function Signup() {
               onValueChange={setSongSuggestion}
             />
             <p className="text-xs px-4">
-              All the data will be encrypted and save secretly, and data will be
-              deleted once the Christmas cards are sent!
+              All data will be kept private and deleted once the Christmas cards
+              are sent.
             </p>
             <Button
               type="submit"
@@ -190,7 +186,8 @@ export default function Signup() {
                         Hmm, something is missing
                       </DialogTitle>
                       <DialogDescription className="text-white/80 whitespace-pre-line">
-                        {formError ?? "Please double check the required fields."}
+                        {formError ??
+                          "Please double check the required fields."}
                       </DialogDescription>
                     </>
                   )}
