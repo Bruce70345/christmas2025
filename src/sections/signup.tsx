@@ -35,8 +35,20 @@ export default function Signup() {
     const trimmedName = name.trim();
     const trimmedAddress = address.trim();
 
-    if (!trimmedName || !trimmedAddress || !postcardTheme) {
-      setFormError("Please fill up the necessary fields.");
+    const missingMessages: string[] = [];
+    if (!trimmedName) {
+      missingMessages.push("Please enter your name.");
+    }
+    if (!trimmedAddress) {
+      missingMessages.push("Please provide your full address.");
+    }
+    if (!postcardTheme) {
+      missingMessages.push("Please pick a postcard theme.");
+    }
+
+    if (missingMessages.length > 0) {
+      setFormError(missingMessages.join("\n"));
+      setIsDialogOpen(true);
       return;
     }
 
@@ -144,11 +156,6 @@ export default function Signup() {
               All the data will be encrypted and save secretly, and data will be
               deleted once the Christmas cards are sent!
             </p>
-            {(formError || error) && (
-              <p className="text-xs px-4 text-red-300">
-                {formError ?? error}
-              </p>
-            )}
             <Button
               type="submit"
               disabled={isSubmitting}
@@ -156,16 +163,31 @@ export default function Signup() {
             >
               {isSubmitting ? "SENDING..." : "SEND"}
             </Button>
-            <Dialog open={isDialogOpen && isSuccess} onOpenChange={handleDialogChange}>
+            <Dialog open={isDialogOpen} onOpenChange={handleDialogChange}>
               <DialogContent className="bg-[#1b0f1a]/90 text-white border-white/10">
                 <DialogHeader>
-                  <DialogTitle className="text-xl tracking-wide text-[#f8c024]">
-                    Merry Christmas!
-                  </DialogTitle>
-                  <DialogDescription className="text-white/80">
-                    So happy to celebrate this Christmas with you! Merry
-                    Christmas 聖誕快樂
-                  </DialogDescription>
+                  {isSuccess ? (
+                    <>
+                      <DialogTitle className="text-xl tracking-wide text-[#f8c024]">
+                        Merry Christmas!
+                      </DialogTitle>
+                      <DialogDescription className="text-white/80">
+                        So happy to celebrate this Christmas with you! Merry
+                        Christmas 聖誕快樂
+                      </DialogDescription>
+                    </>
+                  ) : (
+                    <>
+                      <DialogTitle className="text-xl tracking-wide text-[#f8c024]">
+                        Hmm, something is missing
+                      </DialogTitle>
+                      <DialogDescription className="text-white/80 whitespace-pre-line">
+                        {formError ??
+                          error ??
+                          "Please double check the required fields."}
+                      </DialogDescription>
+                    </>
+                  )}
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose asChild>
