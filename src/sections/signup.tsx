@@ -70,9 +70,9 @@ export default function Signup() {
 
   return (
     <section className="banner-section min-h-[100vh] relative p-[6vw]">
-      <div className="absolute z-20 w-[90vw] top-[17%] -translate-0.5 lg:-translate-0 lg:right-[10%] lg:w-fit lg:top-[27%]">
+      <div className="absolute z-20 w-[90vw] top-[17%] -translate-0.5 lg:-translate-0 lg:right-[4%] lg:w-fit lg:top-[20%]">
         <div className="w-full max-w-md rounded-[40px] border border-white/10 bg-white/5 p-6 text-left text-white shadow-2xl backdrop-blur">
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-3" onSubmit={handleSubmit}>
             <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
               NAME <span className="text-[#ffc840]">*</span>
             </label>
@@ -180,7 +180,7 @@ export default function Signup() {
         </div>
       </div>
       <h2
-        className="absolute top-[5%] left-0 z-10 w-full text-center text-[15vw] uppercase md:text-[14vw] lg:left-[-10%] lg:text-[9vw]"
+        className="absolute top-[5%] left-0 z-10 w-full text-center text-[15vw] uppercase md:text-[14vw] lg:left-[-14%] lg:text-[9vw]"
         data-text="LET'S DO IT!"
       >
         <span className="layered-text banner-title" data-text="LET'S DO IT!">

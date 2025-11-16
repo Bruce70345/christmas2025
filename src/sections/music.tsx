@@ -143,17 +143,17 @@ export default function Music() {
         alt="Festive musicians gathered on stage"
         width={2400}
         height={1970}
-        className="pointer-events-none absolute bottom-[10%] z-10 w-[100vw] lg:w-[65vw] lg:right-[5%] lg:bottom-[-10%]"
+        className="pointer-events-none absolute bottom-[5%] z-10 w-[100vw] lg:w-[65vw] lg:right-[5%] lg:bottom-[-10%]"
       />
       <Image
         src="/graphs/musician.png"
         alt="Solo musician illustration"
         width={6490}
         height={8000}
-        className="pointer-events-none absolute bottom-[10%] z-5 w-[60vw] left-[-15%] md:hidden "
+        className="pointer-events-none absolute bottom-[5%] z-5 w-[60vw] left-[-15%] md:hidden "
       />
       <h2
-        className="absolute top-[5%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[0%] lg:left-[-10%] lg:top-auto lg:text-[13vw]"
+        className="absolute top-[3%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[0%] lg:left-[-10%] lg:top-auto lg:text-[13vw]"
         data-text="PLAYLIST"
       >
         <span
@@ -163,7 +163,7 @@ export default function Music() {
           PLAYLIST
         </span>
       </h2>
-      <div className="absolute top-[20%] z-20 w-full max-w-[90vw] space-y-4 text-[5.2vw] font-semibold tracking-[0.12em] md:space-y-4 md:text-[2.4vw] lg:left-[10%] lg:top-[20%] lg:max-w-[60vw] lg:text-[2vw]">
+      <div className="absolute top-[17%] z-20 w-full max-w-[90vw] space-y-4 text-[5.2vw] font-semibold tracking-[0.12em] md:space-y-4 md:text-[2.4vw] lg:left-[10%] lg:top-[15%] lg:max-w-[60vw] lg:text-[2vw]">
         {isLoading && (
           <p className="text-sm text-white/80">Searching YouTube...</p>
         )}
@@ -172,12 +172,12 @@ export default function Music() {
           href="https://open.spotify.com/playlist/78RGRLghGmsJb2Jvl3fIAD?si=2c529a41328e489e&pt=9246f3beab8f0fd38c0091c305345b5d"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-3 rounded-full border border-[#1ed760]/40 bg-black/40 px-5 py-2 text-left text-white shadow-sm shadow-black/20 backdrop-blur transition hover:bg-black/60"
+          className="inline-flex w-full items-center gap-3 rounded-full border border-[#1ed760]/40 bg-black/40 px-5 py-2 text-left text-white shadow-sm shadow-black/20 backdrop-blur transition hover:bg-black/60"
         >
-          <span className="text-[#1ed760]">
+          <span className="text-[#1ed760] pl-2 md:pl-4">
             <SpotifyIcon />
           </span>
-          <span className="text-[4vw] font-semibold tracking-[0.1em] md:text-[1.5vw]">
+          <span className="text-[4vw] font-semibold tracking-[0.1em] md:text-[1.5vw] pl-2 md:pl-4">
             Share songs with Bruce
           </span>
         </a>
