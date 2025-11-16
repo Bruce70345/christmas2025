@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
-import { createSign } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  createSign,
+  randomBytes,
+} from "node:crypto";
 import type { SignupEntry, SignupPayload } from "@/types/signup";
 
 const FALLBACK_SHEET_ID = "1jOxnQijJhzGyPVR9G8LgQMrAGJV39nLpZPoYVis1Afw";
@@ -11,6 +17,13 @@ const SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const RAW_SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 const GOOGLE_TOKEN_AUDIENCE = "https://oauth2.googleapis.com/token";
 const GOOGLE_SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
+const DATA_ENCRYPTION_SECRET =
+  process.env.DATA_ENCRYPTION_SECRET ??
+  "";
+const ENCRYPTION_KEY = createHash("sha256")
+  .update(DATA_ENCRYPTION_SECRET)
+  .digest();
+const GCM_IV_LENGTH = 12;
 const LOG_PREFIX = "[api/signup]";
 
 type CachedToken = {
@@ -39,10 +52,10 @@ type SheetValuesResponse = {
 function mapRowToEntry(row: string[]): SignupEntry {
   return {
     timestamp: row[0] ?? "",
-    name: row[1] ?? "",
-    address: row[2] ?? "",
-    postcardTheme: row[3] ?? "",
-    contact: row[4] ?? "",
+    name: decryptValue(row[1] ?? ""),
+    address: decryptValue(row[2] ?? ""),
+    postcardTheme: decryptValue(row[3] ?? ""),
+    contact: decryptValue(row[4] ?? ""),
     songSuggestion: row[5] ?? "",
   };
 }
@@ -82,6 +95,45 @@ function validatePayload(payload: Partial<SignupPayload>) {
 function getServiceAccountKey() {
   if (!RAW_SERVICE_ACCOUNT_KEY) return null;
   return RAW_SERVICE_ACCOUNT_KEY.replace(/\\n/g, "\n");
+}
+
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+function encryptValue(value?: string) {
+  if (!value) return "";
+  const iv = randomBytes(GCM_IV_LENGTH);
+  const cipher = createCipheriv("aes-256-gcm", ENCRYPTION_KEY, iv);
+  const encrypted = Buffer.concat([
+    cipher.update(textEncoder.encode(value)),
+    cipher.final(),
+  ]);
+  const authTag = cipher.getAuthTag();
+  return `${iv.toString("base64")}.${authTag.toString(
+    "base64"
+  )}.${encrypted.toString("base64")}`;
+}
+
+function decryptValue(value: string) {
+  if (!value) return "";
+  const [ivBase64, tagBase64, payloadBase64] = value.split(".");
+  if (!ivBase64 || !tagBase64 || !payloadBase64) {
+    return value;
+  }
+  try {
+    const iv = Buffer.from(ivBase64, "base64");
+    const authTag = Buffer.from(tagBase64, "base64");
+    const payload = Buffer.from(payloadBase64, "base64");
+    const decipher = createDecipheriv("aes-256-gcm", ENCRYPTION_KEY, iv);
+    decipher.setAuthTag(authTag);
+    const decrypted = Buffer.concat([
+      decipher.update(payload),
+      decipher.final(),
+    ]);
+    return textDecoder.decode(decrypted);
+  } catch {
+    return value;
+  }
 }
 
 function toBase64Url(value: string | Record<string, unknown>) {
@@ -235,10 +287,10 @@ export async function POST(request: Request) {
   const values = [
     [
       new Date().toISOString(),
-      name,
-      address,
-      postcardTheme,
-      contact,
+      encryptValue(name),
+      encryptValue(address),
+      encryptValue(postcardTheme),
+      encryptValue(contact),
       songSuggestion ?? "",
     ],
   ];
