@@ -116,7 +116,7 @@ function decryptValue(value: string) {
   if (!value) return "";
   const [ivBase64, tagBase64, payloadBase64] = value.split(".");
   if (!ivBase64 || !tagBase64 || !payloadBase64) {
-    return "";
+    return value;
   }
   try {
     const iv = Buffer.from(ivBase64, "base64");
@@ -130,7 +130,7 @@ function decryptValue(value: string) {
     ]);
     return textDecoder.decode(decrypted);
   } catch {
-    return "";
+    return value;
   }
 }
 
