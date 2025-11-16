@@ -102,9 +102,6 @@ export function useYouTubeSongPlayer(): UseYouTubeSongPlayerReturn {
         if (typeof window !== "undefined") {
           window.open(`https://www.youtube.com/watch?v=${videoInfo.videoId}`, "_blank", "noopener,noreferrer");
         }
-        setActiveIndex(index);
-        setCurrentVideoId(videoInfo.videoId);
-        setCurrentSongTitle(videoInfo.title);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       }

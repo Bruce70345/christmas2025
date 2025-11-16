@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useYouTubeSongPlayer } from "@/hooks/useYouTubeSongPlayer";
-import { YouTubeMiniPlayer } from "@/components/youtube-mini-player";
 import { useSongSuggestions } from "@/hooks/useSongSuggestions";
 
 type IconProps = {
@@ -306,11 +305,6 @@ export default function Music() {
           </Dialog>
         </div>
       </div>
-      <YouTubeMiniPlayer
-        videoId={currentVideoId}
-        title={currentSongTitle}
-        onClose={stop}
-      />
     </section>
   );
 }

@@ -25,6 +25,7 @@ const ENCRYPTION_KEY = createHash("sha256")
   .update(DATA_ENCRYPTION_SECRET)
   .digest();
 const GCM_IV_LENGTH = 12;
+const LOG_PREFIX = "[api/signup]";
 
 type CachedToken = {
   token: string;
@@ -223,6 +224,10 @@ async function getAccessToken() {
 
 export async function POST(request: Request) {
   if (!SHEET_ID || !SHEET_RANGE) {
+    console.error(`${LOG_PREFIX} Missing sheet config`, {
+      hasSheetId: Boolean(SHEET_ID),
+      hasRange: Boolean(SHEET_RANGE),
+    });
     return NextResponse.json(
       { error: "Google Sheet 設定缺失。" },
       { status: 500 },
@@ -233,6 +238,7 @@ export async function POST(request: Request) {
   try {
     payload = await request.json();
   } catch {
+    console.error(`${LOG_PREFIX} Invalid JSON payload`);
     return NextResponse.json(
       { error: "無效的 JSON 格式。" },
       { status: 400 },
@@ -250,6 +256,7 @@ export async function POST(request: Request) {
   try {
     accessToken = await getAccessToken();
   } catch (tokenError) {
+    console.error(`${LOG_PREFIX} getAccessToken failed`, tokenError);
     return NextResponse.json(
       {
         error:
@@ -295,7 +302,9 @@ export async function POST(request: Request) {
       errorMessage =
         errorBody.error?.message ??
         errorMessage;
-    } catch {
+      console.error(`${LOG_PREFIX} Sheet append error`, errorBody);
+    } catch (parseError) {
+      console.error(`${LOG_PREFIX} Failed to parse sheet append error`, parseError);
       // ignore parse errors and fall back to generic message
     }
 
@@ -310,6 +319,10 @@ export async function POST(request: Request) {
 
 export async function GET() {
   if (!SHEET_ID || !SHEET_RANGE) {
+    console.error(`${LOG_PREFIX} Missing sheet config for GET`, {
+      hasSheetId: Boolean(SHEET_ID),
+      hasRange: Boolean(SHEET_RANGE),
+    });
     return NextResponse.json(
       { error: "Google Sheet 設定缺失。" },
       { status: 500 },
@@ -320,6 +333,7 @@ export async function GET() {
   try {
     accessToken = await getAccessToken();
   } catch (tokenError) {
+    console.error(`${LOG_PREFIX} getAccessToken failed (GET)`, tokenError);
     return NextResponse.json(
       {
         error:
@@ -351,7 +365,9 @@ export async function GET() {
       errorMessage =
         errorBody.error?.message ??
         errorMessage;
-    } catch {
+      console.error(`${LOG_PREFIX} Sheet read error`, errorBody);
+    } catch (parseError) {
+      console.error(`${LOG_PREFIX} Failed to parse sheet read error`, parseError);
       // ignore parse errors
     }
 
