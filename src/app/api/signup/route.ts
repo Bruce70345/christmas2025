@@ -8,8 +8,8 @@ import {
 } from "node:crypto";
 import type { SignupEntry, SignupPayload } from "@/types/signup";
 
-const FALLBACK_SHEET_ID = "1SjPW3luTZ1gP8AIPbZGKXVJUHiEhxBYJeOgeanxhm-s";
-const FALLBACK_RANGE = "Christmas25!A:F";
+const FALLBACK_SHEET_ID = "1jOxnQijJhzGyPVR9G8LgQMrAGJV39nLpZPoYVis1Afw";
+const FALLBACK_RANGE = "Christmas!A1:F";
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID ?? FALLBACK_SHEET_ID;
 const SHEET_RANGE = process.env.GOOGLE_SHEET_RANGE ?? FALLBACK_RANGE;

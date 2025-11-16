@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import type { SignupEntry, SignupPayload } from "@/types/signup";
 
 type SubmissionResult = {
-  success?: boolean;
-  error?: string;
+  success: boolean;
+  message?: string;
 };
 
 export function useSignupSheet() {
@@ -13,7 +13,7 @@ export function useSignupSheet() {
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const submitSignup = useCallback(async (payload: SignupPayload) => {
+  const submitSignup = useCallback(async (payload: SignupPayload): Promise<SubmissionResult> => {
     setIsSubmitting(true);
     setError(null);
     setIsSuccess(false);
@@ -25,20 +25,23 @@ export function useSignupSheet() {
         body: JSON.stringify(payload),
       });
 
-      const data = (await response.json().catch(() => ({}))) as SubmissionResult;
+      const data = (await response.json().catch(() => ({}))) as {
+        success?: boolean;
+        error?: string;
+      };
       if (!response.ok || !data.success) {
         throw new Error(data.error ?? "Fetch error, try later.");
       }
 
       setIsSuccess(true);
-      return true;
+      return { success: true } satisfies SubmissionResult;
     } catch (submitError) {
       const message =
         submitError instanceof Error
           ? submitError.message
           : "Fetch error, try later.";
       setError(message);
-      return false;
+      return { success: false, message };
     } finally {
       setIsSubmitting(false);
     }

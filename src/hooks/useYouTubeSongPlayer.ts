@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 type VideoInfo = {
   videoId: string;
@@ -18,7 +18,7 @@ type UseYouTubeSongPlayerReturn = {
   stop: () => void;
 };
 
-const API_ENDPOINT = "https://www.googleapis.com/youtube/v3/search";
+const API_ENDPOINT = "/api/youtube/search";
 
 export function useYouTubeSongPlayer(): UseYouTubeSongPlayerReturn {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -27,7 +27,6 @@ export function useYouTubeSongPlayer(): UseYouTubeSongPlayerReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cacheRef = useRef<Record<string, VideoInfo>>({});
-  const apiKey = useMemo(() => process.env.NEXT_PUBLIC_YOUTUBE_API_KEY, []);
 
   const resetState = useCallback(() => {
     setActiveIndex(null);
@@ -42,23 +41,17 @@ export function useYouTubeSongPlayer(): UseYouTubeSongPlayerReturn {
       if (trimmedQuery.length < 3) {
         throw new Error("Song name must have at least 3 characters.");
       }
-      if (!apiKey) {
-        throw new Error("YouTube API key is missing.");
-      }
 
       const cacheKey = trimmedQuery.toLowerCase();
       if (cacheRef.current[cacheKey]) {
         return cacheRef.current[cacheKey];
       }
 
-      const url = new URL(API_ENDPOINT);
-      url.searchParams.set("part", "snippet");
-      url.searchParams.set("type", "video");
-      url.searchParams.set("maxResults", "1");
-      url.searchParams.set("q", trimmedQuery);
-      url.searchParams.set("key", apiKey);
-
-      const response = await fetch(url.toString());
+      const params = new URLSearchParams({
+        query: trimmedQuery,
+        maxResults: "1",
+      });
+      const response = await fetch(`${API_ENDPOINT}?${params.toString()}`);
       if (!response.ok) {
         const message = await response.text();
         throw new Error(message || "Unable to fetch YouTube results.");
@@ -75,7 +68,7 @@ export function useYouTubeSongPlayer(): UseYouTubeSongPlayerReturn {
       cacheRef.current[cacheKey] = videoInfo;
       return videoInfo;
     },
-    [apiKey]
+    []
   );
 
   const togglePlay = useCallback(

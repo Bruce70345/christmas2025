@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 type YouTubeSearchItem = {
   id: string;
@@ -37,7 +37,7 @@ type SearchAction =
   | { type: "SUCCESS"; payload: YouTubeSearchItem[] }
   | { type: "ERROR"; payload: string };
 
-const API_ENDPOINT = "https://www.googleapis.com/youtube/v3/search";
+const API_ENDPOINT = "/api/youtube/search";
 
 function useDebouncedValue<T>(value: T, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -87,7 +87,6 @@ export function useYouTubeSearch(query: string, debounceMs = 500) {
   const [state, dispatch] = useReducer(searchReducer, initialState);
   const { results, isLoading, error } = state;
   const debouncedQuery = useDebouncedValue(query, debounceMs);
-  const apiKey = useMemo(() => process.env.NEXT_PUBLIC_YOUTUBE_API_KEY, []);
 
   useEffect(() => {
     const trimmedQuery = debouncedQuery.trim();
@@ -97,22 +96,17 @@ export function useYouTubeSearch(query: string, debounceMs = 500) {
       return;
     }
 
-    if (!apiKey) {
-      dispatch({ type: "ERROR", payload: "YouTube API key is missing." });
-      return;
-    }
-
     const controller = new AbortController();
-    const url = new URL(API_ENDPOINT);
-    url.searchParams.set("part", "snippet");
-    url.searchParams.set("type", "video");
-    url.searchParams.set("maxResults", "10");
-    url.searchParams.set("q", trimmedQuery);
-    url.searchParams.set("key", apiKey);
+    const params = new URLSearchParams({
+      query: trimmedQuery,
+      maxResults: "10",
+    });
 
     dispatch({ type: "START" });
 
-    fetch(url.toString(), { signal: controller.signal })
+    fetch(`${API_ENDPOINT}?${params.toString()}`, {
+      signal: controller.signal,
+    })
       .then(async (response) => {
         if (!response.ok) {
           const message = await response.text();
@@ -144,7 +138,7 @@ export function useYouTubeSearch(query: string, debounceMs = 500) {
       });
 
     return () => controller.abort();
-  }, [debouncedQuery, apiKey]);
+  }, [debouncedQuery]);
 
   return { results, isLoading, error };
 }

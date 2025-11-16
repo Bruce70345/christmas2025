@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 type AddressPrediction = {
   id: string;
@@ -40,13 +40,7 @@ type AddressAction =
   | { type: "SUCCESS"; payload: AddressPrediction[] }
   | { type: "ERROR"; payload: string };
 
-const PLACES_ENDPOINT =
-  "https://places.googleapis.com/v1/places:autocomplete";
-const FIELD_MASK = [
-  "suggestions.placePrediction.placeId",
-  "suggestions.placePrediction.text",
-  "suggestions.placePrediction.structuredFormat",
-].join(",");
+const API_ENDPOINT = "/api/places/autocomplete";
 
 function useDebouncedValue<T>(value: T, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -96,7 +90,6 @@ export function useAddressSearch(query: string, debounceMs = 500) {
   const [state, dispatch] = useReducer(addressReducer, initialState);
   const { results, isLoading, error } = state;
   const debouncedQuery = useDebouncedValue(query, debounceMs);
-  const apiKey = useMemo(() => process.env.NEXT_PUBLIC_YOUTUBE_API_KEY, []);
 
   useEffect(() => {
     const trimmedQuery = debouncedQuery.trim();
@@ -106,24 +99,14 @@ export function useAddressSearch(query: string, debounceMs = 500) {
       return;
     }
 
-    if (!apiKey) {
-      dispatch({
-        type: "ERROR",
-        payload: "Google API key is missing.",
-      });
-      return;
-    }
-
     const controller = new AbortController();
 
     dispatch({ type: "START" });
 
-    fetch(PLACES_ENDPOINT, {
+    fetch(API_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask": FIELD_MASK,
       },
       body: JSON.stringify({
         input: trimmedQuery,
@@ -173,7 +156,7 @@ export function useAddressSearch(query: string, debounceMs = 500) {
       });
 
     return () => controller.abort();
-  }, [debouncedQuery, apiKey]);
+  }, [debouncedQuery]);
 
   return { results, isLoading, error };
 }
