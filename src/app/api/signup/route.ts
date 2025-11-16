@@ -19,8 +19,7 @@ const GOOGLE_TOKEN_AUDIENCE = "https://oauth2.googleapis.com/token";
 const GOOGLE_SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const DATA_ENCRYPTION_SECRET =
   process.env.DATA_ENCRYPTION_SECRET ??
-  process.env.NEXT_PUBLIC_DATA_ENCRYPTION_SECRET ??
-  "dev-christmas-secret";
+  "";
 const ENCRYPTION_KEY = createHash("sha256")
   .update(DATA_ENCRYPTION_SECRET)
   .digest();
