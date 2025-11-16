@@ -110,7 +110,9 @@ function encryptValue(value?: string) {
     cipher.final(),
   ]);
   const authTag = cipher.getAuthTag();
-  return `${iv.toString("base64")}.${authTag.toString("base64")}.${encrypted.toString("base64")}`;
+  return `${iv.toString("base64")}.${authTag.toString(
+    "base64"
+  )}.${encrypted.toString("base64")}`;
 }
 
 function decryptValue(value: string) {
@@ -136,8 +138,7 @@ function decryptValue(value: string) {
 }
 
 function toBase64Url(value: string | Record<string, unknown>) {
-  const serialized =
-    typeof value === "string" ? value : JSON.stringify(value);
+  const serialized = typeof value === "string" ? value : JSON.stringify(value);
   return Buffer.from(serialized)
     .toString("base64")
     .replace(/\+/g, "-")
@@ -201,7 +202,7 @@ async function getAccessToken() {
   if (!tokenResponse.ok) {
     const errorBody = await tokenResponse.text();
     throw new Error(
-      `Google OAuth 失敗：${errorBody || tokenResponse.statusText}`,
+      `Google OAuth 失敗：${errorBody || tokenResponse.statusText}`
     );
   }
 
@@ -230,7 +231,18 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(
       { error: "Google Sheet 設定缺失。" },
-      { status: 500 },
+      { status: 500 }
+    );
+  }
+
+  if (!SERVICE_ACCOUNT_EMAIL || !RAW_SERVICE_ACCOUNT_KEY) {
+    console.error(`${LOG_PREFIX} Missing service account config`, {
+      hasEmail: Boolean(SERVICE_ACCOUNT_EMAIL),
+      hasKey: Boolean(RAW_SERVICE_ACCOUNT_KEY),
+    });
+    return NextResponse.json(
+      { error: "Google Service Account 設定缺失。" },
+      { status: 500 }
     );
   }
 
@@ -239,10 +251,7 @@ export async function POST(request: Request) {
     payload = await request.json();
   } catch {
     console.error(`${LOG_PREFIX} Invalid JSON payload`);
-    return NextResponse.json(
-      { error: "無效的 JSON 格式。" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "無效的 JSON 格式。" }, { status: 400 });
   }
 
   const result = validatePayload(payload);
@@ -264,12 +273,14 @@ export async function POST(request: Request) {
             ? tokenError.message
             : "Google OAuth 取得 token 失敗。",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
   const endpoint = new URL(
-    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_RANGE)}:append`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(
+      SHEET_RANGE
+    )}:append`
   );
   endpoint.searchParams.set("valueInputOption", "USER_ENTERED");
   endpoint.searchParams.set("insertDataOption", "INSERT_ROWS");
@@ -299,18 +310,19 @@ export async function POST(request: Request) {
 
     try {
       const errorBody = (await sheetResponse.json()) as SheetAppendResponse;
-      errorMessage =
-        errorBody.error?.message ??
-        errorMessage;
+      errorMessage = errorBody.error?.message ?? errorMessage;
       console.error(`${LOG_PREFIX} Sheet append error`, errorBody);
     } catch (parseError) {
-      console.error(`${LOG_PREFIX} Failed to parse sheet append error`, parseError);
+      console.error(
+        `${LOG_PREFIX} Failed to parse sheet append error`,
+        parseError
+      );
       // ignore parse errors and fall back to generic message
     }
 
     return NextResponse.json(
       { error: errorMessage },
-      { status: sheetResponse.status ?? 502 },
+      { status: sheetResponse.status ?? 502 }
     );
   }
 
@@ -325,7 +337,18 @@ export async function GET() {
     });
     return NextResponse.json(
       { error: "Google Sheet 設定缺失。" },
-      { status: 500 },
+      { status: 500 }
+    );
+  }
+
+  if (!SERVICE_ACCOUNT_EMAIL || !RAW_SERVICE_ACCOUNT_KEY) {
+    console.error(`${LOG_PREFIX} Missing service account config (GET)`, {
+      hasEmail: Boolean(SERVICE_ACCOUNT_EMAIL),
+      hasKey: Boolean(RAW_SERVICE_ACCOUNT_KEY),
+    });
+    return NextResponse.json(
+      { error: "Google Service Account 設定缺失。" },
+      { status: 500 }
     );
   }
 
@@ -341,12 +364,14 @@ export async function GET() {
             ? tokenError.message
             : "Google OAuth 取得 token 失敗。",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
   const endpoint = new URL(
-    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_RANGE)}`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(
+      SHEET_RANGE
+    )}`
   );
   endpoint.searchParams.set("valueRenderOption", "UNFORMATTED_VALUE");
 
@@ -362,18 +387,19 @@ export async function GET() {
 
     try {
       const errorBody = (await sheetResponse.json()) as SheetAppendResponse;
-      errorMessage =
-        errorBody.error?.message ??
-        errorMessage;
+      errorMessage = errorBody.error?.message ?? errorMessage;
       console.error(`${LOG_PREFIX} Sheet read error`, errorBody);
     } catch (parseError) {
-      console.error(`${LOG_PREFIX} Failed to parse sheet read error`, parseError);
+      console.error(
+        `${LOG_PREFIX} Failed to parse sheet read error`,
+        parseError
+      );
       // ignore parse errors
     }
 
     return NextResponse.json(
       { error: errorMessage },
-      { status: sheetResponse.status ?? 502 },
+      { status: sheetResponse.status ?? 502 }
     );
   }
 
