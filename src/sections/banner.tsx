@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { DevSheetDownloadTrigger } from "@/components/dev-sheet-download-trigger";
 
 export default function Banner() {
   return (
@@ -35,12 +36,12 @@ export default function Banner() {
         className="absolute left-[5%] top-[10%] z-[10] w-[36vw] max-w-[16rem] md:left-[60%] md:top-[20vh] md:w-[22vw]"
       />
       <p className="absolute right-[5%] top-[15%] z-10 text-right text-[10vw] md:text-[7vw] lg:text-[7vw] lg:top-[45%] lg:-translate-y-1/2 max-text-[200px]">
-        <span
+        <DevSheetDownloadTrigger
           className="layered-text banner-kicker"
           data-text="W/ BRUCE"
         >
           W/ BRUCE
-        </span>
+        </DevSheetDownloadTrigger>
       </p>
       <h1
         className="absolute top-[22%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[5%] lg:top-auto lg:text-[13vw]"

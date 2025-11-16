@@ -5,3 +5,7 @@ export type SignupPayload = {
   contact?: string;
   songSuggestion?: string;
 };
+
+export type SignupEntry = SignupPayload & {
+  timestamp: string;
+};

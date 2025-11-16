@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { SignupPayload } from "@/types/signup";
+import type { SignupEntry, SignupPayload } from "@/types/signup";
 
 type SubmissionResult = {
   success?: boolean;
@@ -49,11 +49,26 @@ export function useSignupSheet() {
     setIsSuccess(false);
   }, []);
 
+  const fetchEntries = useCallback(async () => {
+    const response = await fetch("/api/signup");
+    const data = (await response.json().catch(() => ({}))) as {
+      entries?: SignupEntry[];
+      error?: string;
+    };
+
+    if (!response.ok) {
+      throw new Error(data.error ?? "Unable to load entries.");
+    }
+
+    return data.entries ?? [];
+  }, []);
+
   return {
     submitSignup,
     isSubmitting,
     error,
     isSuccess,
     resetStatus,
+    fetchEntries,
   };
 }
