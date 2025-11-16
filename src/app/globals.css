@@ -193,6 +193,29 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@keyframes material-breath {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+}
+
+.breathing-glow {
+  animation: material-breath 2.8s ease-in-out infinite;
+}
+
+.breathing-button {
+  animation: material-breath 2.1s ease-in-out infinite;
+}
+
   /* For panels with padding, prevent scrollbar from overlapping content */
   .panel-with-scrollbar {
     scrollbar-gutter: stable;

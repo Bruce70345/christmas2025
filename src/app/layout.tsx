@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { MaterialAudioPlayer } from "@/components/material-audio-player";
 
 const anton = localFont({
   src: [
@@ -47,6 +48,7 @@ export default function RootLayout({
         className={`${robotoMono.variable} ${anton.variable} antialiased min-h-screen `}
       >
         {children}
+        <MaterialAudioPlayer />
       </body>
     </html>
   );

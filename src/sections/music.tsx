@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Pause, Play } from "lucide-react";
+import { useEffect, useState } from "react";
 import { siSpotify, siYoutube } from "simple-icons";
 import Marquee from "react-fast-marquee";
 import {
@@ -33,28 +32,32 @@ const songs = [
   "FIREPLACE SLOW DANCE",
 ];
 
-function YoutubeIcon() {
+type IconProps = {
+  className?: string;
+};
+
+function YoutubeIcon({ className = "size-5" }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       role="img"
       aria-hidden="true"
       focusable="false"
-      className="size-5"
+      className={className}
     >
       <path d={siYoutube.path} fill="currentColor" />
     </svg>
   );
 }
 
-function SpotifyIcon() {
+function SpotifyIcon({ className = "size-6" }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       role="img"
       aria-hidden="true"
       focusable="false"
-      className="size-6"
+      className={className}
     >
       <path d={siSpotify.path} fill="currentColor" />
     </svg>
@@ -64,60 +67,63 @@ function SpotifyIcon() {
 type SongRowProps = {
   song: string;
   index: number;
-  isActive: boolean;
   dense?: boolean;
-  onTogglePlay: () => void;
   onOpenYouTube: () => void;
 };
 
 function SongRow({
   song,
   index,
-  isActive,
   dense,
-  onTogglePlay,
   onOpenYouTube,
 }: SongRowProps) {
+  const [isHighlighted, setIsHighlighted] = useState(false);
   const wrapperClass = dense
     ? "text-[5vw] md:text-[2vw] gap-2"
     : "text-base md:text-lg gap-3";
   const buttonPadding = dense ? "p-1.5 md:p-2" : "p-2";
-  const iconSize = dense ? "size-4 md:size-5" : "size-5";
+  const iconSize = dense ? "size-5" : "size-6";
+  const label = `${index + 1}. ${song}`;
+  const handleFocus = () => setIsHighlighted(true);
+  const handleBlur = () => setIsHighlighted(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    const handleScroll = () => {
+      setIsHighlighted(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
-    <div className={`flex items-center ${wrapperClass}`}>
-      <div className="min-w-0 flex-1" title={`${index + 1}. ${song}`}>
-        {isActive ? (
+    <div
+      className={`flex items-center ${wrapperClass}`}
+      tabIndex={0}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onClick={handleFocus}
+    >
+      <div className="min-w-0 flex-1" title={label}>
+        {isHighlighted ? (
           <Marquee gradient={false} speed={18} pauseOnHover className="[&>div]:flex">
-            <span className="pr-12">
-              {index + 1}. {song}
-            </span>
+            <span className="pr-12">{label}</span>
           </Marquee>
         ) : (
-          <span className="block truncate">
-            {index + 1}. {song}
-          </span>
+          <span className="block truncate">{label}</span>
         )}
       </div>
-      <button
-        type="button"
-        aria-label={isActive ? "Pause song" : "Play song"}
-        onClick={onTogglePlay}
-        className={`rounded-full border border-white/20 text-white transition hover:bg-white/10 ${buttonPadding}`}
-      >
-        {isActive ? (
-          <Pause className={iconSize} />
-        ) : (
-          <Play className={iconSize} />
-        )}
-      </button>
       <button
         type="button"
         aria-label="Open YouTube"
         onClick={onOpenYouTube}
         className={`rounded-full border border-white/20 text-white transition hover:bg-white/10 ${buttonPadding}`}
       >
-        <YoutubeIcon />
+        <YoutubeIcon className={iconSize} />
       </button>
     </div>
   );
@@ -126,12 +132,9 @@ function SongRow({
 export default function Music() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
-    activeIndex,
-    isLoading,
     error,
     currentVideoId,
     currentSongTitle,
-    togglePlay,
     openYouTube,
     stop,
   } = useYouTubeSongPlayer();
@@ -164,9 +167,6 @@ export default function Music() {
         </span>
       </h2>
       <div className="absolute top-[17%] z-20 w-full max-w-[90vw] space-y-4 text-[5.2vw] font-semibold tracking-[0.12em] md:space-y-4 md:text-[2.4vw] lg:left-[10%] lg:top-[15%] lg:max-w-[60vw] lg:text-[2vw]">
-        {isLoading && (
-          <p className="text-sm text-white/80">Searching YouTube...</p>
-        )}
         {error && <p className="text-sm text-red-300">{error}</p>}
         <a
           href="https://open.spotify.com/playlist/78RGRLghGmsJb2Jvl3fIAD?si=2c529a41328e489e&pt=9246f3beab8f0fd38c0091c305345b5d"
@@ -178,41 +178,45 @@ export default function Music() {
             <SpotifyIcon />
           </span>
           <span className="text-[4vw] font-semibold tracking-[0.1em] md:text-[1.5vw] pl-2 md:pl-4">
-            Share songs with Bruce
+            Add your favorites here! 
           </span>
         </a>
+        <p className="text-[3.4vw] uppercase tracking-[0.35em] text-white/80 md:text-[1.2vw]">
+          or check the songs people recommended instead
+        </p>
         {songs.slice(0, 3).map((song, index) => (
           <div
             key={`${song}-${index}`}
-            className="rounded-full border border-white/30 bg-white/10 px-4 py-2 text-left text-white shadow-sm shadow-black/20 backdrop-blur"
+            className="rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-left text-white shadow-sm shadow-black/20 backdrop-blur md:py-2"
           >
             <SongRow
               song={song}
               index={index}
               dense
-              isActive={activeIndex === index}
-              onTogglePlay={() => togglePlay(index, song)}
               onOpenYouTube={() => openYouTube(index, song)}
             />
           </div>
         ))}
         <div className="flex justify-start">
-            <Dialog
-              open={isDialogOpen}
-              onOpenChange={(open) => {
-                setIsDialogOpen(open);
-                stop();
-              }}
-            >
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              stop();
+            }}
+          >
             <DialogTrigger asChild>
               <button
                 type="button"
-                className="rounded-full border border-yellow-400 px-5 py-2 text-[4.4vw] font-semibold tracking-[0.1em] text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-[#004369] md:text-[1.4vw]"
+                className="rounded-full border border-yellow-400 px-5 py-1.5 text-[4.4vw] font-semibold tracking-[0.1em] text-yellow-400 transition-colors hover:bg-yellow-400 hover:text-[#004369] md:py-2 md:text-[1.4vw]"
               >
                 [MORE]
               </button>
             </DialogTrigger>
-            <DialogContent className="bg-[#003453] h-[80vh]">
+            <DialogContent
+              className="bg-[#003453] h-[80vh]"
+              onOpenAutoFocus={(event) => event.preventDefault()}
+            >
               <DialogHeader>
                 <DialogTitle className="mt-4 text-[#fff7ec] text-xl">
                   Christmas Craze
@@ -227,8 +231,6 @@ export default function Music() {
                     <SongRow
                       song={song}
                       index={index}
-                      isActive={activeIndex === index}
-                      onTogglePlay={() => togglePlay(index, song)}
                       onOpenYouTube={() => openYouTube(index, song)}
                     />
                   </div>
