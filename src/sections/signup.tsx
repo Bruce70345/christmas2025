@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,13 +39,17 @@ const turnstileSiteKey =
     isSuccess,
     resetStatus,
   } = useSignupSheet();
-  const handleTurnstileVerify = (token: string) => {
+  const handleTurnstileVerify = useCallback((token: string) => {
     setTurnstileToken(token);
     setFormError(null);
-  };
-  const handleTurnstileExpire = () => {
+  }, []);
+  const handleTurnstileExpire = useCallback(() => {
     setTurnstileToken(null);
-  };
+  }, []);
+  const handleTurnstileError = useCallback((message: string) => {
+    setFormError(message);
+    setTurnstileToken(null);
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -193,10 +197,7 @@ const turnstileSiteKey =
                 siteKey={turnstileSiteKey}
                 onVerify={handleTurnstileVerify}
                 onExpire={handleTurnstileExpire}
-                onError={(message) => {
-                  setFormError(message);
-                  setTurnstileToken(null);
-                }}
+                onError={handleTurnstileError}
                 resetSignal={turnstileResetKey}
                 className="flex justify-center"
               />
