@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { SongSearchField } from "@/components/song-search-field";
 import { AddressSearchField } from "@/components/address-search-field";
+import { TurnstileWidget } from "@/components/turnstile-widget";
 import { useSignupSheet } from "@/hooks/useSignupSheet";
 
 export default function Signup() {
@@ -25,12 +26,26 @@ export default function Signup() {
   const [contact, setContact] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+const turnstileSiteKey =
+  (process.env.NODE_ENV === "production"
+    ? process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    : "1x00000000000000000000AA");
+
   const {
     submitSignup,
     isSubmitting,
     isSuccess,
     resetStatus,
   } = useSignupSheet();
+  const handleTurnstileVerify = (token: string) => {
+    setTurnstileToken(token);
+    setFormError(null);
+  };
+  const handleTurnstileExpire = () => {
+    setTurnstileToken(null);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -56,6 +71,12 @@ export default function Signup() {
       return;
     }
 
+    if (!turnstileToken) {
+      setFormError("Please complete the verification challenge.");
+      setIsDialogOpen(true);
+      return;
+    }
+
     const trimmedContact = contact.trim();
     const trimmedSong = songSuggestion.trim();
 
@@ -65,6 +86,7 @@ export default function Signup() {
       postcardTheme,
       contact: trimmedContact || undefined,
       songSuggestion: trimmedSong || undefined,
+      turnstileToken,
     });
 
     if (success) {
@@ -74,6 +96,8 @@ export default function Signup() {
       setPostcardTheme("");
       setSongSuggestion("");
       setContact("");
+      setTurnstileToken(null);
+      setTurnstileResetKey((prev) => prev + 1);
     } else {
       setFormError(message ?? "Something went wrong, please try again.");
       setIsDialogOpen(true);
@@ -90,7 +114,7 @@ export default function Signup() {
 
   return (
     <section className="banner-section min-h-[100vh] relative p-[6vw]">
-      <div className="absolute z-20 w-[90vw] top-[17%] -translate-0.5 lg:-translate-0 lg:right-[4%] lg:w-fit lg:top-[20%]">
+      <div className="absolute z-20 w-[90vw] top-[13%] -translate-0.5 lg:-translate-0 lg:right-[4%] lg:w-fit lg:top-[17%]">
         <div className="w-full max-w-md rounded-[40px] border border-white/10 bg-white/5 p-6 text-left text-white shadow-2xl backdrop-blur">
           <form className="space-y-3" onSubmit={handleSubmit}>
             <label className="text-xs font-semibold tracking-[0.2em] text-white/70">
@@ -161,9 +185,22 @@ export default function Signup() {
               onValueChange={setSongSuggestion}
             />
             <p className="text-xs px-4">
-              All the data will be encrypted and save secretly, and data will be
-              deleted once the Christmas cards are sent!
+              All data will be kept private and removed once the Christmas cards
+              are sent.
             </p>
+            <div className="mt-3">
+              <TurnstileWidget
+                siteKey={turnstileSiteKey}
+                onVerify={handleTurnstileVerify}
+                onExpire={handleTurnstileExpire}
+                onError={(message) => {
+                  setFormError(message);
+                  setTurnstileToken(null);
+                }}
+                resetSignal={turnstileResetKey}
+                className="flex justify-center"
+              />
+            </div>
             <Button
               type="submit"
               disabled={isSubmitting}
@@ -208,7 +245,7 @@ export default function Signup() {
         </div>
       </div>
       <h2
-        className="absolute top-[5%] left-0 z-10 w-full text-center text-[15vw] uppercase md:text-[14vw] lg:left-[-14%] lg:text-[9vw]"
+        className="absolute top-[2%] left-0 z-10 w-full text-center text-[15vw] uppercase md:text-[14vw] lg:left-[-14%] lg:text-[9vw]"
         data-text="LET'S DO IT!"
       >
         <span className="layered-text banner-title" data-text="LET'S DO IT!">
@@ -222,7 +259,7 @@ export default function Signup() {
         width={2400}
         height={1056}
         priority
-        className="pointer-events-none absolute bottom-[10%] lg:bottom-[15%] lg:left-[5%] left-0 z-10 w-full lg:w-[55vw] transform scale-x-[-1] rotate-345"
+        className="pointer-events-none absolute bottom-[7%] lg:bottom-[15%] lg:left-[5%] left-0 z-10 w-[90%] lg:w-[53vw] transform scale-x-[-1] rotate-345"
       />
     </section>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { SignupEntry, SignupPayload } from "@/types/signup";
+import type { SignupEntry, SignupRequestPayload } from "@/types/signup";
 
 type SubmissionResult = {
   success: boolean;
@@ -13,7 +13,7 @@ export function useSignupSheet() {
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const submitSignup = useCallback(async (payload: SignupPayload): Promise<SubmissionResult> => {
+  const submitSignup = useCallback(async (payload: SignupRequestPayload): Promise<SubmissionResult> => {
     setIsSubmitting(true);
     setError(null);
     setIsSuccess(false);

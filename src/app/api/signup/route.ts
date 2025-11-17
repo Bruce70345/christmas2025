@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  createCipheriv,
-  createDecipheriv,
-  createHash,
-  createSign,
-  randomBytes,
-} from "node:crypto";
-import type { SignupEntry, SignupPayload } from "@/types/signup";
+import { createSign } from "node:crypto";
+import type { SignupEntry, SignupPayload, SignupRequestPayload } from "@/types/signup";
 
 const FALLBACK_SHEET_ID = "1jOxnQijJhzGyPVR9G8LgQMrAGJV39nLpZPoYVis1Afw";
 const FALLBACK_RANGE = "Christmas!A1:F";
@@ -17,13 +11,10 @@ const SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const RAW_SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 const GOOGLE_TOKEN_AUDIENCE = "https://oauth2.googleapis.com/token";
 const GOOGLE_SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
-const DATA_ENCRYPTION_SECRET =
-  process.env.DATA_ENCRYPTION_SECRET ??
-  "";
-const ENCRYPTION_KEY = createHash("sha256")
-  .update(DATA_ENCRYPTION_SECRET)
-  .digest();
-const GCM_IV_LENGTH = 12;
+const TURNSTILE_SECRET_KEY =
+  (process.env.NODE_ENV === "production"
+    ? process.env.TURNSTILE_SECRET_KEY
+    :"1x0000000000000000000000000000000AA");
 const LOG_PREFIX = "[api/signup]";
 
 type CachedToken = {
@@ -49,13 +40,56 @@ type SheetValuesResponse = {
   values?: string[][];
 };
 
+type TurnstileResponse = {
+  success?: boolean;
+  "error-codes"?: string[];
+  challenge_ts?: string;
+  hostname?: string;
+};
+
+async function verifyTurnstileToken(token: string | undefined, remoteIp?: string | null) {
+  if (!TURNSTILE_SECRET_KEY) {
+    console.error(`${LOG_PREFIX} Turnstile secret is missing.`);
+    return false;
+  }
+  if (!token) {
+    return false;
+  }
+
+  const body = new URLSearchParams({
+    secret: TURNSTILE_SECRET_KEY,
+    response: token,
+  });
+  if (remoteIp) {
+    body.set("remoteip", remoteIp);
+  }
+
+  try {
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body,
+    });
+    const data = (await response.json()) as TurnstileResponse;
+    if (!data.success) {
+      console.error(`${LOG_PREFIX} Turnstile verification failed`, data);
+    }
+    return Boolean(data.success);
+  } catch (err) {
+    console.error(`${LOG_PREFIX} Turnstile verification error`, err);
+    return false;
+  }
+}
+
 function mapRowToEntry(row: string[]): SignupEntry {
   return {
     timestamp: row[0] ?? "",
-    name: decryptValue(row[1] ?? ""),
-    address: decryptValue(row[2] ?? ""),
-    postcardTheme: decryptValue(row[3] ?? ""),
-    contact: decryptValue(row[4] ?? ""),
+    name: row[1] ?? "",
+    address: row[2] ?? "",
+    postcardTheme: row[3] ?? "",
+    contact: row[4] ?? "",
     songSuggestion: row[5] ?? "",
   };
 }
@@ -95,45 +129,6 @@ function validatePayload(payload: Partial<SignupPayload>) {
 function getServiceAccountKey() {
   if (!RAW_SERVICE_ACCOUNT_KEY) return null;
   return RAW_SERVICE_ACCOUNT_KEY.replace(/\\n/g, "\n");
-}
-
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
-
-function encryptValue(value?: string) {
-  if (!value) return "";
-  const iv = randomBytes(GCM_IV_LENGTH);
-  const cipher = createCipheriv("aes-256-gcm", ENCRYPTION_KEY, iv);
-  const encrypted = Buffer.concat([
-    cipher.update(textEncoder.encode(value)),
-    cipher.final(),
-  ]);
-  const authTag = cipher.getAuthTag();
-  return `${iv.toString("base64")}.${authTag.toString(
-    "base64"
-  )}.${encrypted.toString("base64")}`;
-}
-
-function decryptValue(value: string) {
-  if (!value) return "";
-  const [ivBase64, tagBase64, payloadBase64] = value.split(".");
-  if (!ivBase64 || !tagBase64 || !payloadBase64) {
-    return value;
-  }
-  try {
-    const iv = Buffer.from(ivBase64, "base64");
-    const authTag = Buffer.from(tagBase64, "base64");
-    const payload = Buffer.from(payloadBase64, "base64");
-    const decipher = createDecipheriv("aes-256-gcm", ENCRYPTION_KEY, iv);
-    decipher.setAuthTag(authTag);
-    const decrypted = Buffer.concat([
-      decipher.update(payload),
-      decipher.final(),
-    ]);
-    return textDecoder.decode(decrypted);
-  } catch {
-    return value;
-  }
 }
 
 function toBase64Url(value: string | Record<string, unknown>) {
@@ -245,7 +240,18 @@ export async function POST(request: Request) {
     );
   }
 
-  let payload: Partial<SignupPayload>;
+  if (!SERVICE_ACCOUNT_EMAIL || !RAW_SERVICE_ACCOUNT_KEY) {
+    console.error(`${LOG_PREFIX} Missing service account config`, {
+      hasEmail: Boolean(SERVICE_ACCOUNT_EMAIL),
+      hasKey: Boolean(RAW_SERVICE_ACCOUNT_KEY),
+    });
+    return NextResponse.json(
+      { error: "Google Service Account 設定缺失。" },
+      { status: 500 }
+    );
+  }
+
+  let payload: Partial<SignupRequestPayload>;
   try {
     payload = await request.json();
   } catch {
@@ -253,12 +259,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "無效的 JSON 格式。" }, { status: 400 });
   }
 
-  const result = validatePayload(payload);
+  const { turnstileToken, ...restPayload } = payload;
+  const result = validatePayload(restPayload as Partial<SignupPayload>);
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
   const { name, address, postcardTheme, contact, songSuggestion } = result.data;
+
+  const clientIp =
+    request.headers.get("cf-connecting-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const isHuman = await verifyTurnstileToken(
+    typeof turnstileToken === "string" ? turnstileToken : undefined,
+    clientIp
+  );
+  if (!isHuman) {
+    return NextResponse.json(
+      { error: "Unable to verify the challenge. Please try again." },
+      { status: 400 }
+    );
+  }
 
   let accessToken: string;
   try {
@@ -287,10 +308,10 @@ export async function POST(request: Request) {
   const values = [
     [
       new Date().toISOString(),
-      encryptValue(name),
-      encryptValue(address),
-      encryptValue(postcardTheme),
-      encryptValue(contact),
+      name,
+      address,
+      postcardTheme,
+      contact ?? "",
       songSuggestion ?? "",
     ],
   ];
@@ -336,6 +357,17 @@ export async function GET() {
     });
     return NextResponse.json(
       { error: "Google Sheet 設定缺失。" },
+      { status: 500 }
+    );
+  }
+
+  if (!SERVICE_ACCOUNT_EMAIL || !RAW_SERVICE_ACCOUNT_KEY) {
+    console.error(`${LOG_PREFIX} Missing service account config (GET)`, {
+      hasEmail: Boolean(SERVICE_ACCOUNT_EMAIL),
+      hasKey: Boolean(RAW_SERVICE_ACCOUNT_KEY),
+    });
+    return NextResponse.json(
+      { error: "Google Service Account 設定缺失。" },
       { status: 500 }
     );
   }

@@ -6,6 +6,10 @@ export type SignupPayload = {
   songSuggestion?: string;
 };
 
+export type SignupRequestPayload = SignupPayload & {
+  turnstileToken?: string;
+};
+
 export type SignupEntry = SignupPayload & {
   timestamp: string;
 };

@@ -3,7 +3,7 @@ import { DevSheetDownloadTrigger } from "@/components/dev-sheet-download-trigger
 
 export default function Banner() {
   return (
-    <section className="banner-section relative grid min-h-[100svh] place-items-center overflow-hidden px-[6vw] pb-[8vh] pt-[12vh] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh] lg:px-[6vw] lg:pb-[8vh] lg:pt-[12vh]">
+    <section className="banner-section relative grid min-h-[100vh] place-items-center overflow-hidden px-[6vw] pb-[8vh] pt-[12vh] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh] lg:px-[6vw] lg:pb-[8vh] lg:pt-[12vh]">
       <Image
         src="/graphs/banner.png"
         alt="Illustrated gathering of Greek gods"
