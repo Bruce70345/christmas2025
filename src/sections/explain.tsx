@@ -1,10 +1,12 @@
 import Image from "next/image";
+import { SnowfallLayer } from "@/components/snowfall-layer";
 
 export default function Explain() {
 
   return (
     <section className="banner-section min-h-[100vh] relative overflow-hidden p-[2rem] text-center lg:p-[4rem]]">
-      <div className="space-y-5 w-[90vw] rounded-3xl border border-white/20 bg-white/5 text-left backdrop-blur p-[2rem] lg:p-[3rem] absolute top-[25%] left-1/2 -translate-x-1/2 lg:-translate-x-[-10%] lg:w-[40vw] lg:top-[55%] shadow-2xl">
+      <SnowfallLayer className="z-[6]" />
+      <div className="space-y-5 w-[90vw] rounded-3xl border border-white/20 bg-white/5 text-left backdrop-blur p-[2rem] lg:p-[3rem] absolute top-[25%] left-1/2 -translate-x-1/2 lg:-translate-x-[-10%] lg:w-[40vw] lg:top-[55%] shadow-2xl z-10">
           <p className="flex items-start gap-3">
             <span className="mt-[0.2rem] h-2 w-2 rounded-full bg-[#ffc840]" />
             <span>Christmas is always a lovely holiday, and I&apos;m planning to send Christmas cards to friends in 2025.</span>

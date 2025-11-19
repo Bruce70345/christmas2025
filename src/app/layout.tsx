@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full bg-[#004369] text-slate-900">
       <body
-        className={`${robotoMono.variable} ${anton.variable} antialiased min-h-screen `}
+        className={`${robotoMono.variable} ${anton.variable} min-h-screen overflow-x-hidden antialiased`}
       >
         {children}
         <MaterialAudioPlayer />

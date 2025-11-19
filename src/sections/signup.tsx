@@ -17,6 +17,7 @@ import { SongSearchField } from "@/components/song-search-field";
 import { AddressSearchField } from "@/components/address-search-field";
 import { TurnstileWidget } from "@/components/turnstile-widget";
 import { useSignupSheet } from "@/hooks/useSignupSheet";
+import { SnowfallLayer } from "@/components/snowfall-layer";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -118,6 +119,7 @@ const turnstileSiteKey =
 
   return (
     <section className="banner-section min-h-[100vh] relative p-[6vw]">
+      <SnowfallLayer className="z-[6]" />
       <div className="absolute z-20 w-[90vw] top-[13%] -translate-0.5 lg:-translate-0 lg:right-[4%] lg:w-fit lg:top-[17%]">
         <div className="w-full max-w-md rounded-[40px] border border-white/10 bg-white/5 p-6 text-left text-white shadow-2xl backdrop-blur">
           <form className="space-y-3" onSubmit={handleSubmit}>
@@ -189,7 +191,7 @@ const turnstileSiteKey =
               onValueChange={setSongSuggestion}
             />
             <p className="text-xs px-4">
-              All data will be kept private and removed once the Christmas cards
+              All data will be encrypted, kept private and removed once the Christmas cards
               are sent.
             </p>
             <div className="mt-3">

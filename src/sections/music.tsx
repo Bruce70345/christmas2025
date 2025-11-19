@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useYouTubeSongPlayer } from "@/hooks/useYouTubeSongPlayer";
 import { useSongSuggestions } from "@/hooks/useSongSuggestions";
+import { SnowfallLayer } from "@/components/snowfall-layer";
 
 type IconProps = {
   className?: string;
@@ -174,6 +175,7 @@ export default function Music() {
 
   return (
     <section className="banner-section relative grid min-h-[100svh] place-items-center overflow-hidden px-[6vw] py-[8vw] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh]">
+      <SnowfallLayer className="z-[6]" />
       <Image
         src="/graphs/musicGroup.png"
         alt="Festive musicians gathered on stage"

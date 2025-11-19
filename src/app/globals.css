@@ -240,10 +240,34 @@ body {
     background-clip: content-box;
   }
 
-  .panel-with-scrollbar::-webkit-scrollbar-thumb:hover {
+.panel-with-scrollbar::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground) / 0.25);
     background-clip: content-box;
   }
+
+.snowfall-flake {
+  position: absolute;
+  top: -5%;
+  display: block;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35));
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  animation-name: snowfall-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  will-change: transform;
+  filter: blur(0.2px);
+}
+
+@keyframes snowfall-drift {
+  0% {
+    transform: translate3d(0, -10%, 0);
+  }
+  100% {
+    transform: translate3d(var(--snow-drift, 0), 110vh, 0);
+  }
+}
 
 @layer base {
   * {

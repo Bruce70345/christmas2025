@@ -17,6 +17,7 @@ import { toPng } from "html-to-image";
 import type { KonvaEventObject, Node as KonvaNode } from "konva/lib/Node";
 import type { Transformer as KonvaTransformer } from "konva/lib/shapes/Transformer";
 import type { Image as KonvaImageNode } from "konva/lib/shapes/Image";
+import { SnowfallLayer } from "@/components/snowfall-layer";
 
 type StampPlacement = {
   id: string;
@@ -54,6 +55,7 @@ export default function Presepe() {
   const [isStampMode, setIsStampMode] = useState(true);
   const stampAreaRef = useRef<HTMLDivElement>(null);
   const presepeSectionRef = useRef<HTMLElement | null>(null);
+  const infoAutoTriggeredRef = useRef(false);
   const suppressMouseStampRef = useRef(false);
   const suppressResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
@@ -194,6 +196,28 @@ export default function Presepe() {
 
     window.addEventListener("resize", updateSize);
     return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  useEffect(() => {
+    const sectionEl = presepeSectionRef.current;
+    if (!sectionEl || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !infoAutoTriggeredRef.current) {
+            infoAutoTriggeredRef.current = true;
+            setInfoOpen(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    observer.observe(sectionEl);
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -362,6 +386,7 @@ export default function Presepe() {
       ref={presepeSectionRef}
       className="banner-section min-h-[100vh] relative p-[6vw]"
     >
+      <SnowfallLayer className="z-[6]" />
       <div className="absolute right-[6%] top-[2%] z-20 flex gap-3">
         <PresepeFolderModal onAssetSelected={handleAssetSelected} />
         <button
@@ -553,6 +578,7 @@ export default function Presepe() {
                 fill
                 sizes="(max-width: 768px) 90vw, 640px"
                 className="object-cover"
+                draggable={false}
                 priority={false}
               />
             </div>

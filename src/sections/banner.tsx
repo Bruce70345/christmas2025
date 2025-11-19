@@ -1,9 +1,11 @@
 import Image from "next/image";
 import { DevSheetDownloadTrigger } from "@/components/dev-sheet-download-trigger";
+import { SnowfallLayer } from "@/components/snowfall-layer";
 
 export default function Banner() {
   return (
     <section className="banner-section relative grid min-h-[100vh] place-items-center overflow-hidden px-[6vw] pb-[8vh] pt-[12vh] text-center md:px-[8vw] md:pb-[10vh] md:pt-[14vh] lg:px-[6vw] lg:pb-[8vh] lg:pt-[12vh]">
+      <SnowfallLayer className="z-[6]" />
       <Image
         src="/graphs/banner.png"
         alt="Illustrated gathering of Greek gods"
