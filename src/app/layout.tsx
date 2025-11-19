@@ -35,7 +35,25 @@ const robotoMono = localFont({
 
 export const metadata: Metadata = {
   title: "Christmas W/Bruce 2025",
-  description: "Join with me this Christmas, Christmas card from Taiwan",
+  description: "Celebrate Christmas with Bruce, postcards, festive music, and warm wishes from Taiwan.",
+  openGraph: {
+    title: "Christmas W/Bruce 2025",
+    description: "Celebrate Christmas with Bruce, postcards, festive music, and warm wishes from Taiwan.",
+    images: [
+      {
+        url: "/graphs/DEMO-PC/58.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Preview of Christmas W/Bruce 2025 experience",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Christmas W/Bruce 2025",
+    description: "Celebrate Christmas with Bruce, postcards, festive music, and warm wishes from Taiwan.",
+    images: ["/graphs/DEMO-PC/58.jpg"],
+  },
 };
 
 export default function RootLayout({
