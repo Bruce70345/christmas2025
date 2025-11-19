@@ -13,6 +13,7 @@ import {
 import { PresepeFolderModal } from "@/components/presepe-folder-modal";
 import { useToast } from "@/components/ui/use-toast";
 import { Layer, Stage, Image as KonvaImage, Transformer } from "react-konva";
+import { toPng } from "html-to-image";
 import type { KonvaEventObject, Node as KonvaNode } from "konva/lib/Node";
 import type { Transformer as KonvaTransformer } from "konva/lib/shapes/Transformer";
 import type { Image as KonvaImageNode } from "konva/lib/shapes/Image";
@@ -32,6 +33,12 @@ type StageDimensions = {
   height: number;
 };
 
+type NavigatorWithCapabilities = Navigator & {
+  vibrate?: (pattern?: number | number[]) => boolean;
+  share?: (data?: ShareData) => Promise<void>;
+  canShare?: (data?: ShareData) => boolean;
+};
+
 export default function Presepe() {
   const [infoOpen, setInfoOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
@@ -46,6 +53,7 @@ export default function Presepe() {
   });
   const [isStampMode, setIsStampMode] = useState(true);
   const stampAreaRef = useRef<HTMLDivElement>(null);
+  const presepeSectionRef = useRef<HTMLElement | null>(null);
   const suppressMouseStampRef = useRef(false);
   const suppressResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
@@ -58,15 +66,14 @@ export default function Presepe() {
     }
     return window.matchMedia("(pointer: coarse)").matches;
   });
+  const [isSaving, setIsSaving] = useState(false);
   const activeAsset = selectedAsset;
   const isStampActive = Boolean(activeAsset && isStampMode);
   const { toast } = useToast();
 
   const triggerHapticFeedback = () => {
     if (typeof window === "undefined") return;
-    const navigatorRef = window.navigator as Navigator & {
-      vibrate?: (pattern?: number | number[]) => boolean;
-    };
+    const navigatorRef = window.navigator as NavigatorWithCapabilities;
     if (typeof navigatorRef?.vibrate === "function") {
       navigatorRef.vibrate(150);
     }
@@ -77,6 +84,66 @@ export default function Presepe() {
       description: mode === "stamp" ? "Stamp mode enabled" : "Cursor mode enabled",
       duration: 1500,
     });
+  };
+
+  const downloadDataUrl = (dataUrl: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = filename;
+    link.rel = "noopener";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleSavePresepe = async () => {
+    if (!presepeSectionRef.current || isSaving) return;
+    try {
+      setIsSaving(true);
+      const node = presepeSectionRef.current;
+      const pixelRatio = Math.min(Math.max(window.devicePixelRatio || 1.5, 1), 3);
+      const dataUrl = await toPng(node, {
+        cacheBust: true,
+        pixelRatio,
+        skipAutoScale: false,
+      });
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const filename = `MyPresepe<${day}/${month}/2025>.png`;
+      const navigatorRef = window.navigator as NavigatorWithCapabilities;
+      const shareSupported =
+        isTouchDevice &&
+        typeof navigatorRef?.share === "function" &&
+        typeof navigatorRef?.canShare === "function";
+
+      if (shareSupported) {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], filename, { type: "image/png" });
+        if (navigatorRef.canShare?.({ files: [file] })) {
+          await navigatorRef.share?.({
+            files: [file],
+            title: "My Presepe",
+            text: "Sharing my presepe creation!",
+          });
+          toast({ description: "Saved through share", duration: 1500 });
+          return;
+        }
+      }
+
+      downloadDataUrl(dataUrl, filename);
+      toast({ description: "Presepe downloaded", duration: 1500 });
+    } catch (error) {
+      console.error("Failed to save presepe", error);
+      toast({
+        variant: "destructive",
+        description: "Save failed, please try again",
+        duration: 2000,
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const enableStampMode = () => {
@@ -291,7 +358,10 @@ export default function Presepe() {
   };
 
   return (
-    <section className="banner-section min-h-[100vh] relative p-[6vw]">
+    <section
+      ref={presepeSectionRef}
+      className="banner-section min-h-[100vh] relative p-[6vw]"
+    >
       <div className="absolute right-[6%] top-[2%] z-20 flex gap-3">
         <PresepeFolderModal onAssetSelected={handleAssetSelected} />
         <button
@@ -345,8 +415,9 @@ export default function Presepe() {
         <button
           type="button"
           aria-label="Save presepe"
-          onClick={() => console.log("save clicked")}
-          className="rounded-full border border-white/60 bg-white/10 p-3 text-white backdrop-blur transition hover:bg-white/30"
+          onClick={handleSavePresepe}
+          disabled={isSaving}
+          className="rounded-full border border-white/60 bg-white/10 p-3 text-white backdrop-blur transition hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Save className="h-5 w-5" />
         </button>

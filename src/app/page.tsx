@@ -5,5 +5,5 @@ import Signup from "@/sections/signup";
 import Presepe from "@/sections/presepe";
 
 export default function Home() {
-  return <><Presepe></Presepe><Banner/><Music/><Explain /><Signup/></>;
+  return <><Banner/><Music/><Presepe /><Explain /><Signup/></>;
 }
