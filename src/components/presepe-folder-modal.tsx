@@ -24,7 +24,13 @@ const presepeSvgFiles = [
   "window.svg",
 ];
 
-export function PresepeFolderModal() {
+type PresepeFolderModalProps = {
+  onAssetSelected?: (asset: string) => void;
+};
+
+export function PresepeFolderModal({
+  onAssetSelected,
+}: PresepeFolderModalProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -66,9 +72,14 @@ export function PresepeFolderModal() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {presepeSvgFiles.map((file) => (
-                <div
+                <button
+                  type="button"
                   key={file}
-                  className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 text-center"
+                  onClick={() => {
+                    onAssetSelected?.(file);
+                    setOpen(false);
+                  }}
+                  className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 text-center transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/60"
                 >
                   <Image
                     src={`/graphs/presepe/${file}`}
@@ -77,10 +88,7 @@ export function PresepeFolderModal() {
                     height={180}
                     className="h-28 w-full object-contain"
                   />
-                  {/* <span className="text-xs uppercase tracking-wide text-white/70">
-                    {file.replace(".svg", "")}
-                  </span> */}
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -89,4 +97,3 @@ export function PresepeFolderModal() {
     </>
   );
 }
-

@@ -179,17 +179,17 @@ export default function Music() {
         alt="Festive musicians gathered on stage"
         width={2400}
         height={1970}
-        className="pointer-events-none absolute bottom-[5%] z-10 w-[100vw] lg:w-[65vw] lg:right-[5%] lg:bottom-[-10%]"
+        className="pointer-events-none absolute bottom-[0%] z-10 w-[100vw] lg:w-[65vw] lg:right-[5%] lg:bottom-[-10%]"
       />
       <Image
         src="/graphs/musician.png"
         alt="Solo musician illustration"
         width={6490}
         height={8000}
-        className="pointer-events-none absolute bottom-[5%] z-5 w-[60vw] left-[-15%] md:hidden "
+        className="pointer-events-none absolute bottom-[0%] z-5 w-[60vw] left-[-15%] md:hidden "
       />
       <h2
-        className="absolute top-[3%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[0%] lg:left-[-10%] lg:top-auto lg:text-[13vw]"
+        className="absolute top-[0%] z-10 w-full text-center text-[18vw] uppercase md:text-[14vw] lg:bottom-[0%] lg:left-[-10%] lg:top-auto lg:text-[13vw]"
         data-text="PLAYLIST"
       >
         <span
