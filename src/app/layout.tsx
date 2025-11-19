@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { MaterialAudioPlayer } from "@/components/material-audio-player";
+import { Toaster } from "@/components/ui/toaster";
 
 const anton = localFont({
   src: [
@@ -49,6 +50,7 @@ export default function RootLayout({
       >
         {children}
         <MaterialAudioPlayer />
+        <Toaster />
       </body>
     </html>
   );

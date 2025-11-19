@@ -11,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { PresepeFolderModal } from "@/components/presepe-folder-modal";
+import { useToast } from "@/components/ui/use-toast";
 import { Layer, Stage, Image as KonvaImage, Transformer } from "react-konva";
 import type { KonvaEventObject, Node as KonvaNode } from "konva/lib/Node";
 import type { Transformer as KonvaTransformer } from "konva/lib/shapes/Transformer";
@@ -51,14 +52,53 @@ export default function Presepe() {
   );
   const transformerRef = useRef<KonvaTransformer | null>(null);
   const [selectedStampId, setSelectedStampId] = useState<string | null>(null);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return false;
+    }
+    return window.matchMedia("(pointer: coarse)").matches;
+  });
   const activeAsset = selectedAsset;
   const isStampActive = Boolean(activeAsset && isStampMode);
+  const { toast } = useToast();
+
+  const triggerHapticFeedback = () => {
+    if (typeof window === "undefined") return;
+    const navigatorRef = window.navigator as Navigator & {
+      vibrate?: (pattern?: number | number[]) => boolean;
+    };
+    if (typeof navigatorRef?.vibrate === "function") {
+      navigatorRef.vibrate(150);
+    }
+  };
+
+  const showModeToast = (mode: "stamp" | "cursor") => {
+    toast({
+      description: mode === "stamp" ? "Stamp mode enabled" : "Cursor mode enabled",
+      duration: 1500,
+    });
+  };
+
+  const enableStampMode = () => {
+    if (!isStampMode) {
+      showModeToast("stamp");
+      triggerHapticFeedback();
+    }
+    setIsStampMode(true);
+  };
+
+  const enableCursorMode = () => {
+    if (isStampMode) {
+      showModeToast("cursor");
+      triggerHapticFeedback();
+    }
+    setIsStampMode(false);
+  };
 
   const handleAssetSelected = (asset: string) => {
     setSelectedAsset(asset);
     setCursorPosition(null);
-    setIsStampMode(true);
+    enableStampMode();
     setSelectedStampId(null);
   };
 
@@ -100,14 +140,21 @@ export default function Presepe() {
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
     const query = window.matchMedia("(pointer: coarse)");
-    const update = () => setIsTouchDevice(query.matches);
-    update();
+    const handleChange = (event: MediaQueryListEvent) =>
+      setIsTouchDevice(event.matches);
+
     if (typeof query.addEventListener === "function") {
-      query.addEventListener("change", update);
-      return () => query.removeEventListener("change", update);
+      query.addEventListener("change", handleChange);
+      return () => query.removeEventListener("change", handleChange);
     }
-    query.addListener(update);
-    return () => query.removeListener(update);
+
+    const legacyQuery = query as MediaQueryListLegacy;
+    if (legacyQuery.addListener) {
+      legacyQuery.addListener(handleChange);
+      return () => legacyQuery.removeListener?.(handleChange);
+    }
+
+    return;
   }, []);
 
   useEffect(() => {
@@ -251,7 +298,7 @@ export default function Presepe() {
           type="button"
           aria-label="Switch to cursor mode"
           onClick={() => {
-            setIsStampMode(false);
+            enableCursorMode();
             setCursorPosition(null);
             setSelectedStampId(null);
           }}
@@ -265,7 +312,7 @@ export default function Presepe() {
           type="button"
           aria-label="Enable stamp mode"
           onClick={() => {
-            setIsStampMode(true);
+            enableStampMode();
             setSelectedStampId(null);
             setCursorPosition(null);
           }}
